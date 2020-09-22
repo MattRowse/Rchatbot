@@ -1,4 +1,9 @@
 library(tidyverse)
+library(lubridate)
+library(plumber)
+library(SnowballC)
+library(tm)
+
 # Chatbot for guiding customers to required documentation
 
 # Methdology
@@ -11,23 +16,25 @@ library(tidyverse)
 # 7. Predict the answer with the trained SVM model
 
 # read data
-data = read.csv("C://Users/bmr057/Documents/Chatbot/Chatquestions.csv", stringsAsFactors = FALSE)
+data = read.csv("C://Users/Documents/Chatbot/Chatquestions.csv", stringsAsFactors = FALSE)
 
 # 1. Convert training questions into document term matrix (sparse matrix with 1s and 0s)
 #clean the text
-library(SnowballC)
-library(tm)
 corpus = VCorpus(VectorSource(data$Question))
 corpus = tm_map(corpus, content_transformer(tolower))
 corpus = tm_map(corpus, removeNumbers)
 corpus = tm_map(corpus, removePunctuation)
+
 # corpus = tm_map(corpus, removeWords, stopwords())
 corpus = tm_map(corpus, stemDocument)
 corpus = tm_map(corpus, stripWhitespace)
+
 # convert to DTM
 dtm = DocumentTermMatrix(corpus)
+
 # convert to dataframe
-dataset = as.data.frame(as.matrix(dtm))
+ dataset = as.data.frame(as.matrix(dtm))
+
 
 # 2. Match the matrix of each training question with its corresponding answer to form a training matrix
 data_train = cbind(data['Answers'], dataset)
@@ -45,11 +52,14 @@ pred = function(x){
   corpus = tm_map(corpus, content_transformer(tolower))
   corpus = tm_map(corpus, removeNumbers)
   corpus = tm_map(corpus, removePunctuation)
+  
   # corpus = tm_map(corpus, removeWords, stopwords())
   corpus = tm_map(corpus, stemDocument)
   corpus = tm_map(corpus, stripWhitespace)
+  
   # convert to DTM
   dtm = DocumentTermMatrix(corpus)
+  
   # convert to dataframe
   data_test = as.data.frame(as.matrix(dtm))
   
@@ -67,3 +77,7 @@ pred = function(x){
 
 # Predict
 pred("Is there any covid job impact?")
+
+# run the plumber api to get responses
+rapi <- plumber::plumb("api.R")  # Where 'api.R' is the location of the code file shown above 
+rapi$run(port=8000)
