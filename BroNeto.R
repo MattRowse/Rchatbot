@@ -9,8 +9,8 @@ library(tm)
 # Methdology
 # 1. Convert training questions into document term matrix (sparse matrix with 1s and 0s)
 # 2. Match the matrix of each training question with its corresponding answer to form a training matrix
-# 3. Train SVM model with the training matrix
-# 4. Propose a testing quesiton
+# 3. Train Support Vector Machines model with the training matrix
+# 4. Propose a testing question
 # 5. Convert the testing question into document term matrix (sparse matrix with 1s and 0s)
 # 6. Merge the testing DTM with training DTM, with testing DTM 1s for all terms and training DTM 0s for all terms
 # 7. Predict the answer with the trained SVM model
