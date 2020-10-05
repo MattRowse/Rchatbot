@@ -3,7 +3,8 @@ library(lubridate)
 library(plumber)
 library(SnowballC)
 library(tm)
-
+library(httr)
+hook <- "https://hooks.slack.com/services/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"
 # Chatbot for guiding customers to required documentation
 
 # Methdology
@@ -71,13 +72,13 @@ pred = function(x){
   # 7. Predict the answer with the trained SVM model
   p = predict(svmfit, data_test)
   answer = as.character(p)
-  # Predict
-  paste("Answer:", answer)
+  body = list(text=paste("Answer: ", answer))
+  POST(hook, encode = "json", body = body)
 }
 
 # Predict
-pred("Can I import purchase orders?")
+pred("can i use a barcode scanner for stocktake")
 
 # run the plumber api to get responses
-rapi <- plumber::plumb("api.R")  # Where 'api.R' is the location of the code file shown above 
-rapi$run(port=8000)
+#rapi <- plumber::plumb("api.R")  # Where 'api.R' is the location of the code file shown above 
+#rapi$run(port=8000)
